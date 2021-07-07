@@ -4,7 +4,7 @@
 This is a React Native app made as an application task for MultiSafepay.
 
 ## Standby
-![Standby](/OpenBooksApp/assets/printscreens/01.standby.png)
+![Standby](/OpenBooksApp/assets/printscreens/01.standby.png?raw=true)
 
 ## Searching for books
 ![Searching](/OpenBooksApp/assets/printscreens/02.searching.png)
