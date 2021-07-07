@@ -35,7 +35,6 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
       setBookDescription(description);
     })
     .catch((error) => {
-      console.log('fetching book details error: ', error);
       Alert.alert('Error', `There was an error while opening this book. Please, try again later.`, [{text: 'Ok'}]);
     });
   }, [book]);

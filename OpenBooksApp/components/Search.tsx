@@ -37,8 +37,6 @@ const Search: React.FC = ({navigation}): JSX.Element => {
 
           // Getting only first 5 results for succinctness
           const firstFiveResults = results.docs.splice(0, 4);
-          console.log('------------------')
-          console.log(firstFiveResults[3])
 
           // Remove unwanted keys from result, creating a proper Book type
           setBooksFound(firstFiveResults.map((result: any) => {
@@ -58,7 +56,6 @@ const Search: React.FC = ({navigation}): JSX.Element => {
       .catch((error) => {
         // In case there is an error when a list was already being displayed, empty it
         setBooksFound([]);
-        console.log('fetching books error: ', error);
         Alert.alert('Error', `There was an error while searching. Please, try again later.`, [{text: 'Ok'}]);
       });
     }
