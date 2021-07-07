@@ -40,7 +40,7 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
   }, [book]);
 
   const handleBuyBook = (): void => {
-    const url = `https://isbnsearch.org/isbn/${book.ISBN}`;
+    const url = `https://www.amazon.com/s?k=${book.Title}`;
 
     Linking.canOpenURL(url)
     .then(supported => {
@@ -54,7 +54,7 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
 
   return bookDescription ? (
     <View>
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row',}}>
         {/* Book cover */}
         <View style={styles.bookCoverWrapper}>
           <Image
@@ -89,6 +89,7 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
               title="Buy it"
               onPress={handleBuyBook}
               style={styles.buyItButton}
+              disabled={!book.ISBN}
             />
           </View>
         </View>
@@ -133,8 +134,7 @@ const styles = StyleSheet.create({
   bookDetailsItemBody: {
     fontSize: 18,
     color: Colors.DarkGray,
-    flexWrap: 'wrap',
-    flex: 1,
+    width: '65%',
   },
   bookDetailsItemBodyWrapper: {
     flexDirection: 'row',
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
   },
   buyItButton: {
     marginTop: 20,
+    width: '65%',
   },
   loadingDescriptionText: {
     justifyContent: 'center',
