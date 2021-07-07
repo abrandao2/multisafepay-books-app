@@ -1,5 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, StyleSheet, FlatList, Text, Alert, Image} from 'react-native';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  Text,
+  Alert,
+  Image,
+  Linking
+} from 'react-native';
 
 import ListItem from './ListItem';
 
@@ -80,6 +89,19 @@ const Search: React.FC = ({navigation}): JSX.Element => {
   const renderItem = ({item}) => {
     return <ListItem book={item} onBookSelect={onBookSelect} />
   };
+
+  const handleVisitGithub = (): void => {
+    const url = 'https://github.com/dev01766';
+
+    Linking.canOpenURL(url)
+    .then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert('Error', `Couldn't open the browser.`, [{text: 'Ok'}]);
+      }
+    })
+  };
   
   return (
     <View>
@@ -102,7 +124,12 @@ const Search: React.FC = ({navigation}): JSX.Element => {
         keyExtractor={(item) => item.Key}
       />
       <View style={styles.logoWrapper}>
-        <Text>Made for</Text>
+        <Text
+          style={styles.madeByText}
+          onPress={handleVisitGithub}
+        >
+          Made by <Text style={styles.myName}>Andre Silva</Text> for
+        </Text>
         <Image
           style={styles.mspLogo}
           source={require('../assets/images/multisafepay-logo.png')}
@@ -113,6 +140,20 @@ const Search: React.FC = ({navigation}): JSX.Element => {
 };
 
 const styles = StyleSheet.create({
+  logoWrapper: {
+    padding: 10,
+    marginTop: 30,
+  },
+  madeByText: {
+    marginBottom: 5,
+  },
+  mspLogo: {
+    height: 40,
+    width: 200,
+  },
+  myName: {
+    color: Colors.DarkBlue,
+  },
   searchInput: {
     color: '#333',
     paddingLeft: 12,
@@ -124,14 +165,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.Blue,
     color: Colors.White,
     fontStyle: 'italic',
-  },
-  mspLogo: {
-    height: 40,
-    width: 200,
-  },
-  logoWrapper: {
-    padding: 10,
-    marginTop: 30,
   },
 });
 
