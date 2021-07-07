@@ -13,11 +13,7 @@ import {
 import Colors from '../const/colors';
 import Book from '../types/book';
 
-interface BookDetailsProps {
-  route: any;
-}
-
-const BookDetails: React.FC<BookDetailsProps> = ({route}): JSX.Element => {
+const BookDetails: React.FC = ({route}): JSX.Element => {
   const book: Book = route.params.book;
   const [bookDescription, setBookDescription] = useState<string | undefined>();
 
@@ -35,12 +31,6 @@ const BookDetails: React.FC<BookDetailsProps> = ({route}): JSX.Element => {
       } else {
         description = result.description.value;
       }
-
-      // // If it's not the first book searched, store the previous one
-      // if (book.Title) {
-      //   setPreviousBook(bookSelected);
-      //   setShowPreviousBookButton(true);
-      // }
 
       setBookDescription(description);
     })
@@ -111,11 +101,17 @@ const BookDetails: React.FC<BookDetailsProps> = ({route}): JSX.Element => {
       </ScrollView>
     </View>
   ) : (
-    <Text>Loading description...</Text>
+    <View style={styles.loadingDescriptionText}>
+      <Text>Loading description...</Text>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  bookCover: {
+    height: 300,
+    width: 180
+  },
   bookCoverWrapper: {
     margin: 10,
     borderWidth: 1,
@@ -128,21 +124,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 10,
   },
-  bookCover: {
-    height: 300,
-    width: 180
+  bookDescription: {
+    color: Colors.DarkGray,
+    padding: 20,
   },
   bookDetails: {
     marginTop: 50,
-  },
-  bookDetailsItemTitle: {
-    fontSize: 16,
-    marginTop: 10,
-    color: Colors.DarkBlue,
-    fontWeight: 'bold',
-  },
-  bookDetailsItemBodyWrapper: {
-    flexDirection: 'row',
   },
   bookDetailsItemBody: {
     fontSize: 18,
@@ -150,12 +137,22 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flex: 1,
   },
-  bookDescription: {
-    color: Colors.DarkGray,
-    padding: 20,
+  bookDetailsItemBodyWrapper: {
+    flexDirection: 'row',
+  },
+  bookDetailsItemTitle: {
+    fontSize: 16,
+    marginTop: 10,
+    color: Colors.DarkBlue,
+    fontWeight: 'bold',
   },
   buyItButton: {
     marginTop: 20,
+  },
+  loadingDescriptionText: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
 });
 
