@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   View,
   Text,
@@ -11,45 +12,30 @@ import {
 } from 'react-native';
 
 import Colors from '../const/colors';
-import Book from '../types/book';
+import Book from '../types/dataTypes';
+import { AppState } from '../redux/rootReducer';
+import { fetchBookDetails } from '../redux/fetchBookDetails';
 
-const BookDetails: React.FC = ({route}): JSX.Element => {
+const BookDetails: React.FC<any> = ({route}): JSX.Element => {
+  const dispatch = useDispatch();
+
   const book: Book = route.params.book;
-  const [bookDescription, setBookDescription] = useState<string | undefined>();
+  const bookDescription = useSelector((state: AppState) => state.bookDetailsReducer.description);
 
   useEffect(() => {
-    // Fetch book details
-    fetch(`https://openlibrary.org/works/${book.Key}.json`)
-    .then(data => data.json())
-    .then(result => {
-      let description: string;
-
-      if (!result.description) {
-        description = `This book doesn't have a description available.`;
-      } else if (typeof result.description === 'string') {
-        description = result.description;
-      } else {
-        description = result.description.value;
-      }
-
-      setBookDescription(description);
-    })
-    .catch((error) => {
-      Alert.alert('Error', `There was an error while opening this book. Please, try again later.`, [{text: 'Ok'}]);
-    });
-  }, [book]);
+    dispatch(fetchBookDetails(route.params.book.Key));
+  }, [route.params.book.Key]);
 
   const handleBuyBook = (): void => {
     const url = `https://www.amazon.com/s?k=${book.Title}`;
 
-    Linking.canOpenURL(url)
-    .then(supported => {
+    Linking.canOpenURL(url).then(supported => {
       if (supported) {
         Linking.openURL(url);
       } else {
         Alert.alert('Error', `Couldn't open the browser.`, [{text: 'Ok'}]);
       }
-    })
+    });
   };
 
   return bookDescription ? (
@@ -64,7 +50,7 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
         </View>
 
         {/* Book details */}
-        <View styles={styles.bookDetails}>
+        <View style={styles.bookDetails}>
           {/* Title */}
           <Text style={styles.bookDetailsItemTitle}>Title:</Text>
           <View style={styles.bookDetailsItemBodyWrapper}>
@@ -88,7 +74,6 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
             <Button
               title="Buy it"
               onPress={handleBuyBook}
-              style={styles.buyItButton}
               disabled={!book.ISBN}
             />
           </View>
@@ -110,7 +95,7 @@ const BookDetails: React.FC = ({route}): JSX.Element => {
 const styles = StyleSheet.create({
   bookCover: {
     height: 300,
-    width: 180
+    width: 180,
   },
   bookCoverWrapper: {
     margin: 10,
