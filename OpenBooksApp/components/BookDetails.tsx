@@ -15,12 +15,14 @@ import Colors from '../const/colors';
 import Book from '../types/dataTypes';
 import { AppState } from '../redux/rootReducer';
 import { fetchBookDetails } from '../redux/fetchBookDetails';
+import { ErrorAlert } from '../redux/setFlags';
 
 const BookDetails: React.FC<any> = ({route}): JSX.Element => {
   const dispatch = useDispatch();
 
   const book: Book = route.params.book;
-  const bookDescription = useSelector((state: AppState) => state.bookDetailsReducer.description);
+  const bookDescription: string = useSelector((state: AppState) => state.bookDetailsReducer.description);
+  const errorAlert: ErrorAlert = useSelector((state: AppState) => state.flagsReducer.errorAlert);
 
   useEffect(() => {
     dispatch(fetchBookDetails(route.params.book.Key));
@@ -86,9 +88,16 @@ const BookDetails: React.FC<any> = ({route}): JSX.Element => {
       </ScrollView>
     </View>
   ) : (
-    <View style={styles.loadingDescriptionText}>
-      <Text>Loading description...</Text>
-    </View>
+    errorAlert.showErrorAlert
+    ? (
+      <View style={styles.errorText}>
+        <Text>{errorAlert.errorMessage}</Text>
+      </View>
+    ) : (
+      <View style={styles.loadingDescriptionText}>
+        <Text>Loading description...</Text>
+      </View>
+    )
   );
 };
 
@@ -133,6 +142,12 @@ const styles = StyleSheet.create({
   buyItButton: {
     marginTop: 20,
     width: '65%',
+  },
+  errorText: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    color: Colors.Red,
   },
   loadingDescriptionText: {
     justifyContent: 'center',

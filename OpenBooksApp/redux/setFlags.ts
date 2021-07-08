@@ -1,10 +1,12 @@
 const SET_SEARCHING_NOTICE_STATUS = 'SET_SEARCHING_NOTICE_STATUS';
 const SET_NO_RESULTS_NOTICE_STATUS = 'SET_NO_RESULTS_NOTICE_STATUS';
+const SET_ERROR_ALERT_STATUS = 'SET_ERROR_ALERT_STATUS';
 
 // Actions related ===============================
 type SetFlagsStatus = {
   type: string;
   status: boolean;
+  errorMessage?: string;
 }
 
 export const setSearchingNoticeStatus = (status: boolean): SetFlagsStatus => {
@@ -21,15 +23,33 @@ export const setNoResultsNoticeStatus = (status: boolean): SetFlagsStatus => {
   };
 };
 
+export const setErrorAlertStatus = (status: boolean, errorMessage: string): SetFlagsStatus => {
+  return {
+    type: SET_ERROR_ALERT_STATUS,
+    status,
+    errorMessage
+  };
+};
+
 // Reducer related ==============================
+export type ErrorAlert = {
+  showErrorAlert: boolean;
+  errorMessage: string;
+}
+
 interface FlagsReducerState {
   showSearchingNotice: boolean;
   showNoResultsNotice: boolean;
+  errorAlert: ErrorAlert;
 }
 
 const initialState: FlagsReducerState = {
   showSearchingNotice: false,
-  showNoResultsNotice: false
+  showNoResultsNotice: false,
+  errorAlert: {
+    showErrorAlert: false,
+    errorMessage: '',
+  },
 };
 
 const flagsReducer = (state: FlagsReducerState = initialState, action: SetFlagsStatus): FlagsReducerState => {
@@ -43,6 +63,14 @@ const flagsReducer = (state: FlagsReducerState = initialState, action: SetFlagsS
       return {
         ...state,
         showNoResultsNotice: action.status,
+      };
+    case SET_ERROR_ALERT_STATUS:
+      return {
+        ...state,
+        errorAlert: {
+          showErrorAlert: action.status,
+          errorMessage: action.errorMessage
+        },
       };
     default:
       return state;

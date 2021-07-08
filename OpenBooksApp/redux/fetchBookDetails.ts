@@ -1,4 +1,5 @@
 import { Dispatch } from 'redux';
+import { setErrorAlertStatus } from './setFlags';
 
 // Action related ===============================
 const FETCH_BOOK_DETAILS = 'FETCH_BOOK_DETAILS';
@@ -36,7 +37,7 @@ export const fetchBookDetails = (bookKey: string) => {
 
         dispatch(fetchBookDetailsAction(bookDescription));
       })
-      .catch((error: Error) => console.log(error));
+      .catch((error: Error) => dispatch(setErrorAlertStatus(true, error.message)));
   };
 };
 

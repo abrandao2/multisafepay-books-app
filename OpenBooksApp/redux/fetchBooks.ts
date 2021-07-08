@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import Book from '../types/dataTypes';
-import { setNoResultsNoticeStatus, setSearchingNoticeStatus } from './setFlags';
+import { setErrorAlertStatus, setNoResultsNoticeStatus, setSearchingNoticeStatus } from './setFlags';
 
 // Action related ===============================
 const FETCH_BOOKS = 'FETCH_BOOKS';
@@ -32,32 +32,31 @@ export function fetchBooks(query: string) {
       dispatch(setSearchingNoticeStatus(true));
 
       fetch(`https://openlibrary.org/search.json?title=${query}`)
-      .then((response: Response) => response.json())
-      .then((data: any) => {
-        const firstFiveResults = data.docs.splice(0, 5);
+        .then((response: Response) => response.json())
+        .then((data: any) => {
+          const firstFiveResults = data.docs.splice(0, 5);
 
-        if (firstFiveResults.length !== 0) {
-          dispatch(fetchBooksAction(firstFiveResults.map((result: any) => {
-            const book: Book = {
-              Key: result.key.slice(7),
-              Title: result.title,
-              Author: result.author_name[0],
-              FirstPublishYear: result.first_publish_year,
-              ISBN: result.isbn[0],
-              CoverCode: result.cover_i,
-            };
-  
-            return book;
-          })));
-        } else {
-          // If no results, show notice and clear list
-          dispatch(setNoResultsNoticeStatus(true));
-          dispatch(fetchBooksAction([]));
-        }
-
-        dispatch(setSearchingNoticeStatus(false));
-      })
-      .catch((error: Error) => console.log(error));
+          if (firstFiveResults.length !== 0) {
+            dispatch(fetchBooksAction(firstFiveResults.map((result: any) => {
+              const book: Book = {
+                Key: result.key.slice(7),
+                Title: result.title,
+                Author: result.author_name[0],
+                FirstPublishYear: result.first_publish_year,
+                ISBN: result.isbn[0],
+                CoverCode: result.cover_i,
+              };
+    
+              return book;
+            })));
+          } else {
+            // If no results, show notice and clear list
+            dispatch(setNoResultsNoticeStatus(true));
+            dispatch(fetchBooksAction([]));
+          }
+        })
+        .catch((error: Error) => dispatch(setErrorAlertStatus(true, error.message)))
+        .finally(() => dispatch(setSearchingNoticeStatus(false)));
     }
   };
 }

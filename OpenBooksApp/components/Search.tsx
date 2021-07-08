@@ -20,7 +20,7 @@ import useDebounce from '../hooks/debounce';
 import {fetchBooks} from '../redux/fetchBooks';
 import { AppState } from '../redux/rootReducer';
 import { NoticeType } from '../types/stateTypes';
-import { setNoResultsNoticeStatus, setSearchingNoticeStatus } from '../redux/setFlags';
+import { setErrorAlertStatus, setNoResultsNoticeStatus, setSearchingNoticeStatus } from '../redux/setFlags';
 
 const Search: React.FC<any> = ({navigation}): JSX.Element => {
   const dispatch = useDispatch();
@@ -30,18 +30,23 @@ const Search: React.FC<any> = ({navigation}): JSX.Element => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const showSearchingNotice = useSelector((state: AppState) => state.flagsReducer.showSearchingNotice);
   const showNoResultsNotice = useSelector((state: AppState) => state.flagsReducer.showNoResultsNotice);
+  const errorAlert = useSelector((state: AppState) => state.flagsReducer.errorAlert);
 
   useEffect(() => {
     dispatch(fetchBooks(debouncedSearchTerm));
   }, [debouncedSearchTerm]);
 
+  useEffect(() => {
+    if (errorAlert.showErrorAlert) {
+      Alert.alert('Error', errorAlert.errorMessage, [{
+        text: 'OK',
+        onPress: () => setErrorAlertStatus(false, '')
+      }]);
+    }
+  }, [errorAlert]);
+
   const onSearchInputChange = (value: string): void => {
     setSearchTerm(value);
-
-    if (!value) {
-      dispatch(setSearchingNoticeStatus(false));
-      dispatch(setNoResultsNoticeStatus(false));
-    }
   };
 
   const onBookSelect = (book: Book): void => {
