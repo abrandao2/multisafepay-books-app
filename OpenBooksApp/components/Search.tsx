@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   View,
   TextInput,
@@ -7,84 +8,48 @@ import {
   Text,
   Alert,
   Image,
-  Linking
+  Linking,
 } from 'react-native';
 
 import ListItem from './ListItem';
+import Notice from './Notice';
 
 import Colors from '../const/colors';
-import Book from '../types/book';
+import Book from '../types/dataTypes';
 import useDebounce from '../hooks/debounce';
+import {fetchBooks} from '../redux/fetchBooks';
+import { AppState } from '../redux/rootReducer';
+import { NoticeType } from '../types/stateTypes';
+import { setNoResultsNoticeStatus, setSearchingNoticeStatus } from '../redux/setFlags';
 
-const Search: React.FC = ({navigation}): JSX.Element => {
-  const [booksFound, setBooksFound] = useState<Array<Book>>([]);
+const Search: React.FC<any> = ({navigation}): JSX.Element => {
+  const dispatch = useDispatch();
+
+  const booksFound = useSelector((state: AppState) => state.booksReducer.books);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [showSearchingStatus, setShowSearchingStatus] = useState(false);
-  const [searchingStatusMessage, setSearchingStatusMessage] = useState('');
+  const showSearchingNotice = useSelector((state: AppState) => state.flagsReducer.showSearchingNotice);
+  const showNoResultsNotice = useSelector((state: AppState) => state.flagsReducer.showNoResultsNotice);
 
   useEffect(() => {
-    if (debouncedSearchTerm) {
-      fetch(`https://openlibrary.org/search.json?title=${debouncedSearchTerm}`)
-      .then(data => data.json())
-      .then(results => {
-        if (results.docs.length === 0) {
-          setSearchingStatusMessage('No results found');
-          setShowSearchingStatus(true);
-        } else {
-          setSearchingStatusMessage('');
-          setShowSearchingStatus(false);
-
-          // Getting only first 5 results for succinctness
-          const firstFiveResults = results.docs.splice(0, 4);
-
-          // Remove unwanted keys from result, creating a proper Book type
-          setBooksFound(firstFiveResults.map((result: any) => {
-            const book: Book = {
-              Key: result.key.slice(7),
-              Title: result.title,
-              Author: result.author_name[0],
-              FirstPublishYear: result.first_publish_year,
-              ISBN: result.isbn[0],
-              CoverCode: result.cover_i,
-            };
-
-            return book;
-          }));
-        }
-      })
-      .catch((error) => {
-        // In case there is an error when a list was already being displayed, empty it
-        setBooksFound([]);
-        Alert.alert('Error', `There was an error while searching. Please, try again later.`, [{text: 'Ok'}]);
-      });
-    }
+    dispatch(fetchBooks(debouncedSearchTerm));
   }, [debouncedSearchTerm]);
 
   const onSearchInputChange = (value: string): void => {
     setSearchTerm(value);
 
-    // If search field is empty, then there should be no list
-    // Otherwise, it's searching in the database and thus the notice is displayed
-    if (value === '') {
-      setBooksFound([]);
-      setShowSearchingStatus(false);
-    } else {
-      setShowSearchingStatus(true);
-      setSearchingStatusMessage('Searching...');
+    if (!value) {
+      dispatch(setSearchingNoticeStatus(false));
+      dispatch(setNoResultsNoticeStatus(false));
     }
   };
 
   const onBookSelect = (book: Book): void => {
-    // Clean search field and list
-    setBooksFound([]);
-    setSearchTerm('');
-
     navigation.navigate('BookDetails', {book});
   };
 
   const renderItem = ({item}) => {
-    return <ListItem book={item} onBookSelect={onBookSelect} />
+    return <ListItem key={Math.random()} book={item} onBookSelect={onBookSelect} />
   };
 
   const handleVisitGithub = (): void => {
@@ -102,24 +67,22 @@ const Search: React.FC = ({navigation}): JSX.Element => {
   
   return (
     <View>
-      {/* <Header title="Open Books Search" /> */}
       <TextInput
         placeholder="Search books..."
         style={styles.searchInput}
         value={searchTerm}
         onChangeText={(value: string) => onSearchInputChange(value)}
       />
-      {showSearchingStatus
+      {showSearchingNotice ? <Notice noticeType={NoticeType.Searching} /> : null}
+      {showNoResultsNotice ? <Notice noticeType={NoticeType.NoResults} /> : null}
+      {booksFound
       ? (
-        <Text style={styles.searchStatus}>
-          {searchingStatusMessage}
-        </Text>
+        <FlatList 
+          data={booksFound}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.Key}
+        />
       ) : null}
-      <FlatList 
-        data={booksFound}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.Key}
-      />
       <View style={styles.logoWrapper}>
         <Text
           style={styles.madeByText}
