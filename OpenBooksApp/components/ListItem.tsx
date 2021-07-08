@@ -1,7 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {View, Text, StyleSheet, TouchableNativeFeedback, Image} from 'react-native';
 
-import Book from '../types/book';
+import Book from '../types/dataTypes';
 import Colors from '../const/colors';
 
 interface ListItemProps {
@@ -11,10 +11,7 @@ interface ListItemProps {
 
 const ListItem: React.FC<ListItemProps> = ({book, onBookSelect}): JSX.Element => {
   return (
-    <TouchableOpacity
-      style={styles.listItem}
-      onPress={() => onBookSelect(book)}
-    >
+    <TouchableNativeFeedback onPress={() => onBookSelect(book)}>
       <View style={styles.rowWrapper}>
         <Image
           style={styles.bookCover}
@@ -26,35 +23,29 @@ const ListItem: React.FC<ListItemProps> = ({book, onBookSelect}): JSX.Element =>
           <Text style={styles.bookISBN}>ISBN: {book.ISBN}</Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </TouchableNativeFeedback>
   );
 };
 
 const styles = StyleSheet.create({
-  listItem: {
-    backgroundColor: Colors.LightGray,
-    padding: 15,
-    borderBottomColor: Colors.Blue,
-    borderBottomWidth: 1,
-  },
-  bookTitle: {
-    fontSize: 18,
-    color: Colors.DarkBlue,
-  },
   bookAuthor: {
     color: Colors.DarkGray,
-    paddingTop: 5,
   },
   bookCover: {
-    height: 50,
-    width: 30,
+    height: 60,
+    width: 35,
     marginRight: 15,
   },
   bookISBN: {
     fontSize: 12,
   },
+  bookTitle: {
+    fontSize: 16,
+    color: Colors.DarkBlue,
+  },
   rowWrapper: {
     flexDirection: 'row',
+    padding: 15,
   },
 });
 
