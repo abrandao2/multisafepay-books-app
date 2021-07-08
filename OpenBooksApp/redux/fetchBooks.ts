@@ -11,7 +11,6 @@ export type FetchBooksAction = {
 }
 
 const fetchBooksAction = (booksFound: Array<Book>): FetchBooksAction => {
-  console.log(booksFound)
   return {
     type: FETCH_BOOKS,
     books: booksFound,
